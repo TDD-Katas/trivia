@@ -40,6 +40,8 @@ public class GameRunner {
             }
 
 
+
+            aGame.moveToNextPlayer();
         } while (notAWinner);
     }
 }

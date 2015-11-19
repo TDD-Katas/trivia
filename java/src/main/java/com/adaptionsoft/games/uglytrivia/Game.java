@@ -59,11 +59,11 @@ public class Game {
             checkIfPlayerCanGetOutOfPenaltyBox(roll);
         }
 
-        if (isPlayerInPenaltyBox(currentPlayerIndex) && !isGettingOutOfPenaltyBox) {
-            //do nothing
-        } else {
+        if (!isPlayerInPenaltyBox(currentPlayerIndex) || isGettingOutOfPenaltyBox) {
             changePlaces_and_askQuestion(roll);
         }
+
+
     }
 
     private void checkIfPlayerCanGetOutOfPenaltyBox(int roll) {
@@ -99,19 +99,19 @@ public class Game {
             System.out.println(rockQuestions.removeFirst());
     }
 
+    boolean lastQuestionWasAnswered;
     public boolean wasCorrectlyAnswered() {
         if (isPlayerInPenaltyBox(currentPlayerIndex) && !isGettingOutOfPenaltyBox) {
-            moveToNextPlayer();
+            lastQuestionWasAnswered = false;
             return true;
+        } else {
+            displayCorrectAnswer();
+            awardCoinToCurrentPlayer();
+            displayPlayerCoins(getCurrentPlayerName(), getCoinsForPlayer(currentPlayerIndex));
         }
 
-        displayCorrectAnswer();
-        awardCoinToCurrentPlayer();
-        displayPlayerCoins(getCurrentPlayerName(), getCoinsForPlayer(currentPlayerIndex));
 
-        boolean winner = didPlayerWin();
-        moveToNextPlayer();
-        return winner;
+        return shouldContinueGame();
     }
 
 
@@ -121,19 +121,24 @@ public class Game {
         displayPlayerSentToPenaltyBox(getCurrentPlayerName());
         putPlayerInPenaltyBox(currentPlayerIndex);
 
-        moveToNextPlayer();
         return true;
     }
 
-    //~~~~ More complex methods
+    private boolean shouldContinueGame() {
 
-    private void moveToNextPlayer() {
+
+        return !didPlayerWin(currentPlayerIndex);
+    }
+
+    public void moveToNextPlayer() {
         incrementPlayerIndex();
         resetPlayerIfLast(currentPlayerIndex, players);
     }
 
-    private boolean didPlayerWin() {
-        return !(getCoinsForPlayer(currentPlayerIndex) == 6);
+    //~~~~ More complex methods
+
+    private boolean didPlayerWin(int currentPlayerIndex) {
+        return getCoinsForPlayer(currentPlayerIndex) == 6;
     }
 
     //~~~~ Basic Class methods

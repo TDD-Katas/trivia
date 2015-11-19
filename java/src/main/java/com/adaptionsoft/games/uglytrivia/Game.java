@@ -2,6 +2,7 @@ package com.adaptionsoft.games.uglytrivia;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Optional;
 
 public class Game {
     ArrayList players = new ArrayList();
@@ -42,57 +43,95 @@ public class Game {
     }
 
     public void p_roll(int roll) {
+        RollResult rollResult = do_roll(roll, players, currentPlayerIndex, inPenaltyBox, places, isGettingOutOfPenaltyBox, popQuestions, scienceQuestions, sportsQuestions, rockQuestions);
+
+        places[currentPlayerIndex] = rollResult.getNewPlayerPlace();
+        isGettingOutOfPenaltyBox = rollResult.isGettingOutOfPenaltyBox();
+
+
+        LinkedList categoryUsedForQuestion = rollResult.getCategoryUsedForQuestion();
+        if (!categoryUsedForQuestion.isEmpty()) {
+            categoryUsedForQuestion.removeFirst();
+        }
+    }
+
+    static class RollResult {
+        private final int newPlayerPlace;
+        private final boolean isGettingOutOfPenaltyBox;
+        private final LinkedList categoryUsedForQuestion;
+
+        public RollResult(int newPlayerPlace, boolean isGettingOutOfPenaltyBox, LinkedList categoryUsedForQuestion) {
+            this.newPlayerPlace = newPlayerPlace;
+            this.isGettingOutOfPenaltyBox = isGettingOutOfPenaltyBox;
+            this.categoryUsedForQuestion = categoryUsedForQuestion;
+        }
+
+        public int getNewPlayerPlace() {
+            return newPlayerPlace;
+        }
+
+        public boolean isGettingOutOfPenaltyBox() {
+            return isGettingOutOfPenaltyBox;
+        }
+
+        public LinkedList getCategoryUsedForQuestion() {
+            return categoryUsedForQuestion;
+        }
+    }
+
+    private static RollResult do_roll(int roll, ArrayList players, int currentPlayerIndex, boolean[] inPenaltyBox, int[] places, boolean isGettingOutOfPenaltyBox, LinkedList popQuestions, LinkedList scienceQuestions, LinkedList sportsQuestions, LinkedList rockQuestions) {
         display(getCurrentPlayerName(players, currentPlayerIndex) + " is the current player");
         display("They have rolled a " + roll);
 
+        boolean newValueForIsGettingOutOfPenaltyBox = isGettingOutOfPenaltyBox;
         if (isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox)) {
-            game_checkIfPlayerCanGetOutOfPenaltyBox(roll);
+            newValueForIsGettingOutOfPenaltyBox = game_checkIfPlayerCanGetOutOfPenaltyBox(roll, currentPlayerIndex, players);
         }
 
-        if (!isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox) || isGettingOutOfPenaltyBox) {
-            place_changePlaceForPlayer(currentPlayerIndex, roll);
-            String category = getCategoryForPlayerPlace(places[currentPlayerIndex]);
+
+        int playerPlace = places[currentPlayerIndex];
+        LinkedList categoryToUse = new LinkedList();
+        if (!isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox) || newValueForIsGettingOutOfPenaltyBox) {
+            playerPlace = place_changePlaceForPlayer(roll, places, currentPlayerIndex, players);
+
+            String category = getCategoryForPlayerPlace(playerPlace);
             display("The category is " + category);
 
-            cat_askQuestion_and_removeQuestionFromCategory(category);
+            if (category == "Pop")
+                categoryToUse = popQuestions;
+            if (category == "Science")
+                categoryToUse = scienceQuestions;
+            if (category == "Sports")
+                categoryToUse = sportsQuestions;
+            if (category == "Rock")
+                categoryToUse = rockQuestions;
+
+            System.out.println(categoryToUse.peekFirst());
         }
+
+        return new RollResult(playerPlace, newValueForIsGettingOutOfPenaltyBox, categoryToUse);
     }
 
 
-
-    private void game_checkIfPlayerCanGetOutOfPenaltyBox(int roll) {
+    private static boolean game_checkIfPlayerCanGetOutOfPenaltyBox(int roll, int currentPlayerIndex, ArrayList players) {
         if (roll % 2 != 0) {
             display(getCurrentPlayerName(players, currentPlayerIndex) + " is getting out of the penalty box");
-            isGettingOutOfPenaltyBox = true;
+            return true;
         } else {
             display(getCurrentPlayerName(players, currentPlayerIndex) + " is not getting out of the penalty box");
-            isGettingOutOfPenaltyBox = false;
+            return false;
         }
     }
 
-    private void place_changePlaceForPlayer(int player, int roll) {
-        places[this.currentPlayerIndex] = places[player] + roll;
-        if (places[this.currentPlayerIndex] > 11) places[this.currentPlayerIndex] = places[this.currentPlayerIndex] - 12;
+    private static int place_changePlaceForPlayer(int roll, int[] places, int currentPlayerIndex, ArrayList players) {
+        int value = places[currentPlayerIndex] + roll;
+        if (value > 11) value = value - 12;
 
         display(getCurrentPlayerName(players, currentPlayerIndex)
                 + "'s new location is "
-                + places[currentPlayerIndex]);
-    }
+                + value);
 
-    private void cat_askQuestion_and_removeQuestionFromCategory(String currentCategory) {
-        LinkedList categoryQuestions = new LinkedList();
-
-        if (currentCategory == "Pop")
-            categoryQuestions = popQuestions;
-        if (currentCategory == "Science")
-            categoryQuestions = scienceQuestions;
-        if (currentCategory == "Sports")
-            categoryQuestions = sportsQuestions;
-        if (currentCategory == "Rock")
-            categoryQuestions = rockQuestions;
-
-        System.out.println(categoryQuestions.peekFirst());
-        categoryQuestions.removeFirst();
+        return value;
     }
 
     public void p_answer(int value) {

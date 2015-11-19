@@ -1,12 +1,9 @@
 
 package com.adaptionsoft.games.trivia.runner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
 import com.adaptionsoft.games.uglytrivia.Game;
+
+import java.util.Random;
 
 
 public class GameRunner {
@@ -22,27 +19,27 @@ public class GameRunner {
         Game aGame = new Game();
 
         for (String player : players) {
-            aGame.add(player);
+            aGame.p_add(player);
         }
 
-        System.out.println("isPlayable = " + aGame.isPlayable());
+        System.out.println("isPlayable = " + aGame.p_isPlayable());
 
         Random rand = new Random(seed);
 
         do {
 
-            aGame.roll(rand.nextInt(5) + 1);
+            aGame.p_roll(rand.nextInt(5) + 1);
 
             if (rand.nextInt(9) == 7) {
-                aGame.wrongAnswer();
+                aGame.p_wrongAnswer();
             } else {
-                aGame.wasCorrectlyAnswered();
+                aGame.p_wasCorrectlyAnswered();
             }
 
-            notAWinner = aGame.shouldContinueGame();
+            notAWinner = aGame.p_shouldContinueGame();
 
 
-            aGame.moveToNextPlayer();
+            aGame.game_moveToNextPlayer();
         } while (notAWinner);
     }
 }

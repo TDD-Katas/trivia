@@ -100,34 +100,34 @@ public class Game {
     }
 
     boolean lastQuestionWasAnswered;
-    public boolean wasCorrectlyAnswered() {
+    public void wasCorrectlyAnswered() {
         if (isPlayerInPenaltyBox(currentPlayerIndex) && !isGettingOutOfPenaltyBox) {
             lastQuestionWasAnswered = false;
-            return true;
         } else {
             displayCorrectAnswer();
             awardCoinToCurrentPlayer();
             displayPlayerCoins(getCurrentPlayerName(), getCoinsForPlayer(currentPlayerIndex));
+            lastQuestionWasAnswered = true;
         }
-
-
-        return shouldContinueGame();
     }
 
 
-    public boolean wrongAnswer() {
+    public void wrongAnswer() {
         displayQuestionIncorrect();
 
         displayPlayerSentToPenaltyBox(getCurrentPlayerName());
         putPlayerInPenaltyBox(currentPlayerIndex);
 
-        return true;
+        lastQuestionWasAnswered = false;
     }
 
-    private boolean shouldContinueGame() {
+    public boolean shouldContinueGame() {
+        if (lastQuestionWasAnswered) {
+            return !didPlayerWin(currentPlayerIndex);
+        } else {
+            return true;
+        }
 
-
-        return !didPlayerWin(currentPlayerIndex);
     }
 
     public void moveToNextPlayer() {

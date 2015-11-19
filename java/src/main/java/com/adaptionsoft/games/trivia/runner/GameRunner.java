@@ -34,11 +34,12 @@ public class GameRunner {
             aGame.roll(rand.nextInt(5) + 1);
 
             if (rand.nextInt(9) == 7) {
-                notAWinner = aGame.wrongAnswer();
+                aGame.wrongAnswer();
             } else {
-                notAWinner = aGame.wasCorrectlyAnswered();
+                aGame.wasCorrectlyAnswered();
             }
 
+            notAWinner = aGame.shouldContinueGame();
 
 
             aGame.moveToNextPlayer();

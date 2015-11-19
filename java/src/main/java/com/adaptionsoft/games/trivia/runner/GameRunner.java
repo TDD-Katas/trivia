@@ -1,5 +1,6 @@
 
 package com.adaptionsoft.games.trivia.runner;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,35 +12,34 @@ import com.adaptionsoft.games.uglytrivia.Game;
 public class GameRunner {
 
 
-	public static void main(String[] args) {
-		runWith(111, new Players("Chet", "Pat", "Sue"));
-	}
+    public static void main(String[] args) {
+        runWith(111, new Players("Chet", "Pat", "Sue"));
+    }
 
-	public static void runWith(int seed, Players players) {
-		boolean notAWinner;
+    public static void runWith(int seed, Players players) {
+        boolean notAWinner;
 
-		Game aGame = new Game();
+        Game aGame = new Game();
 
-		for (String player : players) {
-			aGame.add(player);
-		}
+        for (String player : players) {
+            aGame.add(player);
+        }
 
-		System.out.println("isPlayable = "+aGame.isPlayable());
+        System.out.println("isPlayable = " + aGame.isPlayable());
 
-		Random rand = new Random(seed);
+        Random rand = new Random(seed);
 
-		do {
+        do {
 
-			aGame.roll(rand.nextInt(5) + 1);
+            aGame.roll(rand.nextInt(5) + 1);
 
-			if (rand.nextInt(9) == 7) {
-				notAWinner = aGame.wrongAnswer();
-			} else {
-				notAWinner = aGame.wasCorrectlyAnswered();
-			}
+            if (rand.nextInt(9) == 7) {
+                notAWinner = aGame.wrongAnswer();
+            } else {
+                notAWinner = aGame.wasCorrectlyAnswered();
+            }
 
 
-
-		} while (notAWinner);
-	}
+        } while (notAWinner);
+    }
 }

@@ -1,7 +1,15 @@
-[111, []] = java.lang.reflect.InvocationTargetException 
-[121, []] = java.lang.reflect.InvocationTargetException 
-[321, []] = java.lang.reflect.InvocationTargetException 
-[4323, []] = java.lang.reflect.InvocationTargetException 
+[111, []] = isPlayable = false
+java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
+ 
+[121, []] = isPlayable = false
+java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
+ 
+[321, []] = isPlayable = false
+java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
+ 
+[4323, []] = isPlayable = false
+java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
+ 
 [111, [Chet]] = Chet was added
 They are player number 1
 isPlayable = false
@@ -766,4 +774,52 @@ The category is Pop
 Pop Question 5
 Answer was correct!!!!
 Chet now has 6 Gold Coins.
+ 
+[111, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+They are player number 1
+Pat was added
+They are player number 2
+Sue was added
+They are player number 3
+Mark was added
+They are player number 4
+Anthony was added
+They are player number 5
+java.lang.ArrayIndexOutOfBoundsException: 6
+ 
+[121, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+They are player number 1
+Pat was added
+They are player number 2
+Sue was added
+They are player number 3
+Mark was added
+They are player number 4
+Anthony was added
+They are player number 5
+java.lang.ArrayIndexOutOfBoundsException: 6
+ 
+[321, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+They are player number 1
+Pat was added
+They are player number 2
+Sue was added
+They are player number 3
+Mark was added
+They are player number 4
+Anthony was added
+They are player number 5
+java.lang.ArrayIndexOutOfBoundsException: 6
+ 
+[4323, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+They are player number 1
+Pat was added
+They are player number 2
+Sue was added
+They are player number 3
+Mark was added
+They are player number 4
+Anthony was added
+They are player number 5
+java.lang.ArrayIndexOutOfBoundsException: 6
  

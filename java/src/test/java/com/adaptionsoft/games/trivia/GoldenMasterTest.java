@@ -23,6 +23,7 @@ public class GoldenMasterTest {
                 new Players(),
                 new Players("Chet"),
                 new Players("Chet", "Pat", "Sue"),
+                new Players("Chet", "Pat", "Sue", "Mark", "Anthony", "Greg"),
         };
         LegacyApprovals.LockDown(this, "runGame", seeds, players);
     }
@@ -31,23 +32,29 @@ public class GoldenMasterTest {
     //~~~ Helpers
 
     public String runGame(Integer seed, Players players) {
-
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream outStream = new PrintStream(outContent);
+        PrintStream errStream = new PrintStream(errContent);
 
-        PrintStream originalOutStream = System.out;
-        PrintStream originalErrStream = System.err;
 
-        System.setOut(new PrintStream(outContent));
-        System.setErr(new PrintStream(errContent));
+        try {
+            PrintStream originalOutStream = System.out;
+            PrintStream originalErrStream = System.err;
 
-        GameRunner.runWith(seed, players);
+            System.setOut(outStream);
+            System.setErr(errStream);
 
-        System.setOut(originalOutStream);
-        System.setErr(originalErrStream);
+            GameRunner.runWith(seed, players);
 
-        System.out.println(outContent.toString());
-        System.out.println(errContent.toString());
+            System.setOut(originalOutStream);
+            System.setErr(originalErrStream);
+
+            System.out.println(outContent.toString());
+            System.out.println(errContent.toString());
+        } catch (Exception e) {
+            errStream.println(e.toString());
+        }
 
         return outContent.toString() + errContent.toString();
     }

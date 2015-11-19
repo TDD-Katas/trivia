@@ -55,65 +55,52 @@ public class Game {
         display(getCurrentPlayerName() + " is the current player");
         display("They have rolled a " + roll);
 
-        if (inPenaltyBox[currentPlayerIndex]) {
-            if (roll % 2 != 0) {
-                isGettingOutOfPenaltyBox = true;
-
-                display(getCurrentPlayerName() + " is getting out of the penalty box");
-                places[currentPlayerIndex] = places[currentPlayerIndex] + roll;
-                if (places[currentPlayerIndex] > 11) places[currentPlayerIndex] = places[currentPlayerIndex] - 12;
-
-                display(getCurrentPlayerName()
-                        + "'s new location is "
-                        + places[currentPlayerIndex]);
-                display("The category is " + currentCategory());
-                askQuestion();
-            } else {
-                display(getCurrentPlayerName() + " is not getting out of the penalty box");
-                isGettingOutOfPenaltyBox = false;
-            }
-
-        } else {
-
-            places[currentPlayerIndex] = places[currentPlayerIndex] + roll;
-            if (places[currentPlayerIndex] > 11) places[currentPlayerIndex] = places[currentPlayerIndex] - 12;
-
-            display(getCurrentPlayerName()
-                    + "'s new location is "
-                    + places[currentPlayerIndex]);
-            display("The category is " + currentCategory());
-            askQuestion();
+        if (isPlayerInPenaltyBox(currentPlayerIndex)) {
+            checkIfPlayerCanGetOutOfPenaltyBox(roll);
         }
 
+        if (isPlayerInPenaltyBox(currentPlayerIndex) && !isGettingOutOfPenaltyBox) {
+            //do nothing
+        } else {
+            changePlaces_and_askQuestion(roll);
+        }
     }
 
-    private void askQuestion() {
-        if (currentCategory() == "Pop")
+    private void checkIfPlayerCanGetOutOfPenaltyBox(int roll) {
+        if (roll % 2 != 0) {
+            display(getCurrentPlayerName() + " is getting out of the penalty box");
+            isGettingOutOfPenaltyBox = true;
+        } else {
+            display(getCurrentPlayerName() + " is not getting out of the penalty box");
+            isGettingOutOfPenaltyBox = false;
+        }
+    }
+
+    private void changePlaces_and_askQuestion(int roll) {
+        places[currentPlayerIndex] = places[currentPlayerIndex] + roll;
+        if (places[currentPlayerIndex] > 11) places[currentPlayerIndex] = places[currentPlayerIndex] - 12;
+
+        display(getCurrentPlayerName()
+                + "'s new location is "
+                + places[currentPlayerIndex]);
+        display("The category is " + getCategoryForPlaces(places[currentPlayerIndex]));
+        askQuestion_and_removeQuestionFromList(places[currentPlayerIndex]);
+    }
+
+    private void askQuestion_and_removeQuestionFromList(int placesValue) {
+        String currentCategory = getCategoryForPlaces(placesValue);
+        if (currentCategory == "Pop")
             System.out.println(popQuestions.removeFirst());
-        if (currentCategory() == "Science")
+        if (currentCategory == "Science")
             System.out.println(scienceQuestions.removeFirst());
-        if (currentCategory() == "Sports")
+        if (currentCategory == "Sports")
             System.out.println(sportsQuestions.removeFirst());
-        if (currentCategory() == "Rock")
+        if (currentCategory == "Rock")
             System.out.println(rockQuestions.removeFirst());
     }
 
-
-    private String currentCategory() {
-        if (places[currentPlayerIndex] == 0) return "Pop";
-        if (places[currentPlayerIndex] == 4) return "Pop";
-        if (places[currentPlayerIndex] == 8) return "Pop";
-        if (places[currentPlayerIndex] == 1) return "Science";
-        if (places[currentPlayerIndex] == 5) return "Science";
-        if (places[currentPlayerIndex] == 9) return "Science";
-        if (places[currentPlayerIndex] == 2) return "Sports";
-        if (places[currentPlayerIndex] == 6) return "Sports";
-        if (places[currentPlayerIndex] == 10) return "Sports";
-        return "Rock";
-    }
-
     public boolean wasCorrectlyAnswered() {
-        if (inPenaltyBox[currentPlayerIndex] && !isGettingOutOfPenaltyBox) {
+        if (isPlayerInPenaltyBox(currentPlayerIndex) && !isGettingOutOfPenaltyBox) {
             moveToNextPlayer();
             return true;
         }
@@ -126,6 +113,7 @@ public class Game {
         moveToNextPlayer();
         return winner;
     }
+
 
     public boolean wrongAnswer() {
         displayQuestionIncorrect();
@@ -162,8 +150,12 @@ public class Game {
         return players.get(currentPlayerIndex);
     }
 
-    private void putPlayerInPenaltyBox(int currentPlayer) {
-        inPenaltyBox[currentPlayer] = true;
+    private boolean isPlayerInPenaltyBox(int playerIndex) {
+        return inPenaltyBox[playerIndex];
+    }
+
+    private void putPlayerInPenaltyBox(int playerIndex) {
+        inPenaltyBox[playerIndex] = true;
     }
 
     private void resetPlayerIfLast(int currentPlayer, ArrayList players) {
@@ -180,6 +172,19 @@ public class Game {
     }
 
     //~~~~ Extracted pure functions
+
+    private static String getCategoryForPlaces(int placesValue) {
+        if (placesValue == 0) return "Pop";
+        if (placesValue == 4) return "Pop";
+        if (placesValue == 8) return "Pop";
+        if (placesValue == 1) return "Science";
+        if (placesValue == 5) return "Science";
+        if (placesValue == 9) return "Science";
+        if (placesValue == 2) return "Sports";
+        if (placesValue == 6) return "Sports";
+        if (placesValue == 10) return "Sports";
+        return "Rock";
+    }
 
     private static void displayPlayerSentToPenaltyBox(Object playerName) {
         display(playerName + " was sent to the penalty box");

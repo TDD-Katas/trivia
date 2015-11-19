@@ -2,6 +2,7 @@ package com.adaptionsoft.games.trivia;
 
 import approvaltest.BeyondCompareMacReporter;
 import com.adaptionsoft.games.trivia.runner.GameRunner;
+import com.adaptionsoft.games.trivia.runner.Players;
 import org.approvaltests.legacycode.LegacyApprovals;
 import org.approvaltests.reporters.UseReporter;
 import org.junit.Test;
@@ -15,13 +16,21 @@ public class GoldenMasterTest {
 
 	@Test
 	public void lock_down() throws Exception {
-		String[] names = {
-				"name01"
+		Integer[] seeds = {
+				111, 121, 321, 4323
 		};
-		LegacyApprovals.LockDown(this, "processItem", names);
+		Players[] players = new Players[]{
+				new Players(),
+				new Players("Chet"),
+				new Players("Chet", "Pat", "Sue"),
+		};
+		LegacyApprovals.LockDown(this, "runGame", seeds, players);
 	}
 
-	public String processItem(String name) {
+
+	//~~~ Helpers
+
+	public String runGame(Integer seed, Players players) {
 
 		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 		ByteArrayOutputStream errContent = new ByteArrayOutputStream();
@@ -32,7 +41,7 @@ public class GoldenMasterTest {
 		System.setOut(new PrintStream(outContent));
 		System.setErr(new PrintStream(errContent));
 
-		GameRunner.main(new String[] {});
+		GameRunner.runWith(seed, players);
 
 		System.setOut(originalOutStream);
 		System.setErr(originalErrStream);

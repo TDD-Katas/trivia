@@ -100,14 +100,20 @@ public class Game {
 
 
     private static RollResult game_do_roll(int roll, ArrayList players, int currentPlayerIndex, boolean[] inPenaltyBox, int[] places, boolean isGettingOutOfPenaltyBox, Questions questions) {
-        display(getCurrentPlayerName(players, currentPlayerIndex) + " is the current player");
+        Object playerName = getCurrentPlayerName(players, currentPlayerIndex);
+        display(playerName + " is the current player");
         display("They have rolled a " + roll);
 
         boolean newValueForIsGettingOutOfPenaltyBox = isGettingOutOfPenaltyBox;
         if (isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox)) {
-            newValueForIsGettingOutOfPenaltyBox = game_checkIfPlayerCanGetOutOfPenaltyBox(roll, currentPlayerIndex, players);
-        }
+            newValueForIsGettingOutOfPenaltyBox = game_checkIfPlayerRollCanGetOutOfPenaltyBox(roll);
 
+            if (newValueForIsGettingOutOfPenaltyBox) {
+                displayPlayerIsGettingOutOfPenaltyBox(playerName);
+            } else {
+                displayPlayerIsStayingInThePenaltyBox(playerName);
+            }
+        }
 
         int playerPlace = places[currentPlayerIndex];
         LinkedList categoryToUse = new LinkedList();
@@ -231,14 +237,8 @@ public class Game {
 
     //~~~~ PURE penalty box related
 
-    private static boolean game_checkIfPlayerCanGetOutOfPenaltyBox(int roll, int currentPlayerIndex, ArrayList players) {
-        if (roll % 2 != 0) {
-            display(getCurrentPlayerName(players, currentPlayerIndex) + " is getting out of the penalty box");
-            return true;
-        } else {
-            display(getCurrentPlayerName(players, currentPlayerIndex) + " is not getting out of the penalty box");
-            return false;
-        }
+    private static boolean game_checkIfPlayerRollCanGetOutOfPenaltyBox(int rollForPlayer) {
+        return rollForPlayer % 2 != 0;
     }
 
     private static boolean isPlayerInPenaltyBox(int playerIndex, boolean[] penaltyBox) {
@@ -264,6 +264,14 @@ public class Game {
 
     private static void displayPlayerSentToPenaltyBox(Object playerName) {
         display(playerName + " was sent to the penalty box");
+    }
+
+    private static void displayPlayerIsStayingInThePenaltyBox(Object playerName) {
+        display(playerName + " is not getting out of the penalty box");
+    }
+
+    private static void displayPlayerIsGettingOutOfPenaltyBox(Object playerName) {
+        display(playerName + " is getting out of the penalty box");
     }
 
     private static void displayPlayerCoins(Object player, int coins) {

@@ -55,32 +55,29 @@ public class Game {
     }
 
     public void p_answer(int value) {
-        lastQuestionWasAnswered = false;
-        if (game_isPlayerAbleToAnswer(currentPlayerIndex, inPenaltyBox, isGettingOutOfPenaltyBox)) {
-            if (game_isCorrectAnswer(value)) {
-                performActionForCorrectAnswer(currentPlayerIndex, inPenaltyBox, isGettingOutOfPenaltyBox, purses, players);
-                lastQuestionWasAnswered = true;
-            } else {
-                game_performActionForWrongAnswer(currentPlayerIndex, players, inPenaltyBox);
-                lastQuestionWasAnswered = false;
-            }
+        if (game_isCorrectAnswer(value)) {
+            game_performActionForCorrectAnswer(currentPlayerIndex, purses, players);
+        } else {
+            game_performActionForWrongAnswer(currentPlayerIndex, players, inPenaltyBox);
         }
     }
 
-    private static boolean game_isPlayerAbleToAnswer(int currentPlayerIndex, boolean[] inPenaltyBox, boolean isGettingOutOfPenaltyBox) {
+    public boolean p_isCurrentPlayerAllowedToAnswer() {
+        return game_isPlayerAllowedToAnswer(currentPlayerIndex, inPenaltyBox, isGettingOutOfPenaltyBox);
+    }
+
+
+    private static boolean game_isPlayerAllowedToAnswer(int currentPlayerIndex, boolean[] inPenaltyBox, boolean isGettingOutOfPenaltyBox) {
         return !isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox) || isGettingOutOfPenaltyBox;
     }
 
-    boolean lastQuestionWasAnswered;
-
-    private static void performActionForCorrectAnswer(int currentPlayerIndex, boolean[] inPenaltyBox, boolean isGettingOutOfPenaltyBox, int[] purses, ArrayList players) {
+    private static void game_performActionForCorrectAnswer(int currentPlayerIndex, int[] purses, ArrayList players) {
         displayCorrectAnswer();
         awardCoinToCurrentPlayer(currentPlayerIndex, purses);
         displayPlayerCoins(getCurrentPlayerName(players, currentPlayerIndex), getCoinsForPlayer(currentPlayerIndex, purses));
     }
 
-
-    private void game_performActionForWrongAnswer(int currentPlayerIndex, ArrayList players, boolean[] inPenaltyBox) {
+    private static void game_performActionForWrongAnswer(int currentPlayerIndex, ArrayList players, boolean[] inPenaltyBox) {
         displayQuestionIncorrect();
 
         displayPlayerSentToPenaltyBox(getCurrentPlayerName(players, currentPlayerIndex));
@@ -88,12 +85,7 @@ public class Game {
     }
 
     public boolean p_shouldContinueGame() {
-        if (lastQuestionWasAnswered) {
-            return !didPlayerWin(currentPlayerIndex, purses);
-        } else {
-            return true;
-        }
-
+        return !didPlayerWin(currentPlayerIndex, purses);
     }
 
     public void game_moveToNextPlayer() {

@@ -29,7 +29,11 @@ public class GameRunner {
         do {
 
             aGame.p_roll(rand.nextInt(5) + 1);
-            aGame.p_answer(rand.nextInt(9));
+            int answer = rand.nextInt(9);
+
+            if (aGame.p_isCurrentPlayerAllowedToAnswer()) {
+                aGame.p_answer(answer);
+            }
             notAWinner = aGame.p_shouldContinueGame();
 
             aGame.game_moveToNextPlayer();

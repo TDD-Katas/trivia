@@ -55,38 +55,21 @@ public class Game {
     }
 
     public void p_answer(int value) {
-        if (game_isCorrectAnswer(value)) {
-            game_performActionForCorrectAnswer(currentPlayerIndex, purses, players);
-        } else {
-            game_performActionForWrongAnswer(currentPlayerIndex, players, inPenaltyBox);
-        }
+        boolean currentlyInPenaltyBox = inPenaltyBox[currentPlayerIndex];
+        AnswerResult answerResult = game_do_answer(value, purses, currentPlayerIndex, players, currentlyInPenaltyBox);
+
+        purses[currentPlayerIndex] = answerResult.getNewPurseValue();
+        inPenaltyBox[currentPlayerIndex] = answerResult.getPlayerPenaltyBoxStatus();
     }
 
     public boolean p_isCurrentPlayerAllowedToAnswer() {
         return game_isPlayerAllowedToAnswer(currentPlayerIndex, inPenaltyBox, isGettingOutOfPenaltyBox);
     }
 
-
-    private static boolean game_isPlayerAllowedToAnswer(int currentPlayerIndex, boolean[] inPenaltyBox, boolean isGettingOutOfPenaltyBox) {
-        return !isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox) || isGettingOutOfPenaltyBox;
-    }
-
-    private static void game_performActionForCorrectAnswer(int currentPlayerIndex, int[] purses, ArrayList players) {
-        displayCorrectAnswer();
-        awardCoinToCurrentPlayer(currentPlayerIndex, purses);
-        displayPlayerCoins(getCurrentPlayerName(players, currentPlayerIndex), getCoinsForPlayer(currentPlayerIndex, purses));
-    }
-
-    private static void game_performActionForWrongAnswer(int currentPlayerIndex, ArrayList players, boolean[] inPenaltyBox) {
-        displayQuestionIncorrect();
-
-        displayPlayerSentToPenaltyBox(getCurrentPlayerName(players, currentPlayerIndex));
-        putPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox);
-    }
-
     public boolean p_shouldContinueGame() {
         return !didPlayerWin(currentPlayerIndex, purses);
     }
+
 
     public void game_moveToNextPlayer() {
         game_incrementPlayerIndex();
@@ -97,7 +80,6 @@ public class Game {
         currentPlayerIndex++;
     }
 
-
     private void game_resetPlayerIfLast(int currentPlayer, ArrayList players) {
         if (currentPlayer == totalPlayers(players))
             this.currentPlayerIndex = 0;
@@ -105,27 +87,17 @@ public class Game {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
     //~~~~ PURE game related
 
+    private static boolean game_isPlayerAllowedToAnswer(int currentPlayerIndex, boolean[] inPenaltyBox, boolean isGettingOutOfPenaltyBox) {
+        return !isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox) || isGettingOutOfPenaltyBox;
+    }
 
     private static boolean game_isCorrectAnswer(int value) {
         return value != 7;
     }
 
-    //~~~~ PURE place related
-
-    private static int place_changePlaceForPlayer(int roll, int[] places, int currentPlayerIndex, ArrayList players) {
-        int value = places[currentPlayerIndex] + roll;
-        if (value > 11) value = value - 12;
-
-        display(getCurrentPlayerName(players, currentPlayerIndex)
-                + "'s new location is "
-                + value);
-
-        return value;
-    }
-
-    //~~~~ PURE Roll related
 
     private static RollResult game_do_roll(int roll, ArrayList players, int currentPlayerIndex, boolean[] inPenaltyBox, int[] places, boolean isGettingOutOfPenaltyBox, Questions questions) {
         display(getCurrentPlayerName(players, currentPlayerIndex) + " is the current player");
@@ -160,8 +132,8 @@ public class Game {
         return new RollResult(playerPlace, newValueForIsGettingOutOfPenaltyBox, categoryToUse);
     }
 
-    static class RollResult {
 
+    static class RollResult {
         private final int newPlayerPlace;
         private final boolean isGettingOutOfPenaltyBox;
         private final LinkedList categoryUsedForQuestion;
@@ -170,7 +142,6 @@ public class Game {
             this.isGettingOutOfPenaltyBox = isGettingOutOfPenaltyBox;
             this.categoryUsedForQuestion = categoryUsedForQuestion;
         }
-
         public int getNewPlayerPlace() {
             return newPlayerPlace;
         }
@@ -184,14 +155,64 @@ public class Game {
         }
 
     }
+
+    //~~~~ PURE answer related
+
+    private  AnswerResult game_do_answer(int value, int[] purses, int currentPlayerIndex, ArrayList players, boolean currentlyInPenaltyBox) {
+        int currentPurseValue;
+        boolean sendPlayerToPenaltyBox;
+
+        if (game_isCorrectAnswer(value)) {
+            displayCorrectAnswer();
+            currentPurseValue = getCoinsForPlayer(currentPlayerIndex, purses) + 1;
+            displayPlayerCoins(getCurrentPlayerName(players, currentPlayerIndex), currentPurseValue);
+            sendPlayerToPenaltyBox = currentlyInPenaltyBox;
+        } else {
+            displayQuestionIncorrect();
+            currentPurseValue = getCoinsForPlayer(currentPlayerIndex, purses);
+            displayPlayerSentToPenaltyBox(getCurrentPlayerName(players, currentPlayerIndex));
+            sendPlayerToPenaltyBox = true;
+        }
+
+        return new AnswerResult(currentPurseValue, sendPlayerToPenaltyBox);
+    }
+
+    private static class AnswerResult {
+        private final int newPurseValue;
+        private final boolean sendPlayerToPenaltyBox;
+
+        public AnswerResult(int newPurseValue, boolean sendPlayerToPenaltyBox) {
+            this.newPurseValue = newPurseValue;
+            this.sendPlayerToPenaltyBox = sendPlayerToPenaltyBox;
+        }
+
+        public int getNewPurseValue() {
+            return newPurseValue;
+        }
+
+        public boolean getPlayerPenaltyBoxStatus() {
+            return sendPlayerToPenaltyBox;
+        }
+    }
+
+    //~~~~ PURE place related
+
+
+    private static int place_changePlaceForPlayer(int roll, int[] places, int currentPlayerIndex, ArrayList players) {
+        int value = places[currentPlayerIndex] + roll;
+        if (value > 11) value = value - 12;
+
+        display(getCurrentPlayerName(players, currentPlayerIndex)
+                + "'s new location is "
+                + value);
+
+        return value;
+    }
+
     //~~~~ PURE purse related
 
     private static boolean didPlayerWin(int currentPlayerIndex, int[] purses) {
         return getCoinsForPlayer(currentPlayerIndex, purses) == 6;
-    }
-
-    private static void awardCoinToCurrentPlayer(int currentPlayerIndex, int[] purses) {
-        purses[currentPlayerIndex]++;
     }
 
     private static int getCoinsForPlayer(int currentPlayer, int[] purses) {
@@ -222,10 +243,6 @@ public class Game {
 
     private static boolean isPlayerInPenaltyBox(int playerIndex, boolean[] penaltyBox) {
         return penaltyBox[playerIndex];
-    }
-
-    private static void putPlayerInPenaltyBox(int playerIndex, boolean[] penaltyBox) {
-        penaltyBox[playerIndex] = true;
     }
 
     //~~~~ PURE category related
@@ -267,11 +284,11 @@ public class Game {
     private static void display(String x) {
         System.out.println(x);
     }
-
     private static class Questions {
         private final LinkedList popQuestions;
         private final LinkedList scienceQuestions;
         private final LinkedList sportsQuestions;
+
         private final LinkedList rockQuestions;
 
         private Questions(LinkedList popQuestions, LinkedList scienceQuestions, LinkedList sportsQuestions, LinkedList rockQuestions) {
@@ -292,9 +309,9 @@ public class Game {
         public LinkedList getSportsQuestions() {
             return sportsQuestions;
         }
-
         public LinkedList getRockQuestions() {
             return rockQuestions;
         }
+
     }
 }

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Game {
-    ArrayList players = new ArrayList();
-
     PlayerState[] playerStates = new PlayerState[6];
 
     private int totalPlayers;
@@ -30,7 +28,6 @@ public class Game {
 
     public boolean game_builder_add(String playerName) {
         int currentIndex = totalPlayers;
-        players.add(playerName);
 
         playerStates[currentIndex]= new PlayerState(false, false, playerName, 0, 0);
         totalPlayers = currentIndex + 1;
@@ -43,7 +40,7 @@ public class Game {
     }
 
     public boolean game_builder_isPlayable() {
-        return (players.size() >= 2);
+        return (totalPlayers >= 2);
     }
 
 
@@ -87,32 +84,24 @@ public class Game {
 
     }
 
-    public boolean p_round(int rollValue, int answer) {
-        boolean notAWinner;
-
-
-        PlayerState retrievedPlayerState = playerStates[currentPlayerIndex];
-
-        PlayerState currentPlayerState =
-                new PlayerState(retrievedPlayerState.isCurrentPlayerIsGettingOutOfPenaltyBox(),
-                        retrievedPlayerState.isCurrentPlayerIsCurrentlyInThePenaltyBox(),
-                        retrievedPlayerState.getCurrentPlayerName(),
-                        retrievedPlayerState.getCurrentPlayerPlace(),
-                        retrievedPlayerState.getPurse());
+    private PlayerState p_roll(int rollValue, PlayerState currentPlayerState) {
         RollResult rollResult = game_do_roll(rollValue, currentPlayerState, QUESTIONS);
 
-        //Writes
+        //Writes !
         LinkedList categoryUsedForQuestion = rollResult.getCategoryUsedForQuestion();
         if (!categoryUsedForQuestion.isEmpty()) {
             categoryUsedForQuestion.removeFirst();
         }
-        PlayerState playerStateAfterRoll =
-                new PlayerState(rollResult.isGettingOutOfPenaltyBox(),
-                        currentPlayerState.isCurrentPlayerIsCurrentlyInThePenaltyBox(),
-                        retrievedPlayerState.getCurrentPlayerName(),
-                        rollResult.getNewPlayerPlace(),
-                        currentPlayerState.getPurse());
 
+
+        return new PlayerState(rollResult.isGettingOutOfPenaltyBox(),
+                currentPlayerState.isCurrentPlayerIsCurrentlyInThePenaltyBox(),
+                currentPlayerState.getCurrentPlayerName(),
+                rollResult.getNewPlayerPlace(),
+                currentPlayerState.getPurse());
+    }
+
+    private PlayerState p_answer(int answer, PlayerState playerStateAfterRoll) {
         PlayerState playerStateAfterAnswer;
         if (game_isPlayerAllowedToAnswer(playerStateAfterRoll.isCurrentPlayerIsGettingOutOfPenaltyBox(),
                 playerStateAfterRoll.isCurrentPlayerIsCurrentlyInThePenaltyBox())) {
@@ -128,15 +117,26 @@ public class Game {
         } else {
             playerStateAfterAnswer = playerStateAfterRoll;
         }
+        return playerStateAfterAnswer;
+    }
 
-        playerStates[currentPlayerIndex] = playerStateAfterAnswer;
+    public boolean p_round(int rollValue, int answer) {
+        boolean notAWinner;
 
+
+        PlayerState playerStateBefore = playerStates[currentPlayerIndex];
+
+        PlayerState playerStateAfterRoll = p_roll(rollValue, playerStateBefore);
+        PlayerState playerStateAfterAnswer = p_answer(answer, playerStateAfterRoll);
+
+        //Writes !
         notAWinner = !didPlayerWin(playerStateAfterAnswer.getPurse());
 
+        //Writes !
+        playerStates[currentPlayerIndex] = playerStateAfterAnswer;
         currentPlayerIndex = game_getNextPlayer(currentPlayerIndex, totalPlayers);
         return notAWinner;
     }
-
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,7 +180,7 @@ public class Game {
         int newPlayerPlace = playerState.getCurrentPlayerPlace();
         LinkedList categoryToUse = new LinkedList();
         if (!playerState.isCurrentPlayerIsCurrentlyInThePenaltyBox() || newValueForIsGettingOutOfPenaltyBox) {
-            newPlayerPlace = place_changePlaceForPlayer(roll, playerState.getCurrentPlayerPlace(), playerState.getCurrentPlayerName());
+            newPlayerPlace = place_newPlaceForPlayer(roll, playerState.getCurrentPlayerPlace(), playerState.getCurrentPlayerName());
 
             String category = getCategoryForPlayerPlace(newPlayerPlace);
             display("The category is " + category);
@@ -246,10 +246,6 @@ public class Game {
         return new AnswerResult(currentPurseValue, sendPlayerToPenaltyBox);
     }
 
-    private static Object currentPlayerName(int currentPlayerIndex, ArrayList players) {
-        return getCurrentPlayerName(players, currentPlayerIndex);
-    }
-
     private static class AnswerResult {
         private final int newPurseValue;
         private final boolean sendPlayerToPenaltyBox;
@@ -271,7 +267,7 @@ public class Game {
     //~~~~ PURE place related
 
 
-    private static int place_changePlaceForPlayer(int roll, int currentPlayerPlace, Object currentPlayerName) {
+    private static int place_newPlaceForPlayer(int roll, int currentPlayerPlace, Object currentPlayerName) {
         int value = currentPlayerPlace + roll;
         if (value > 11) value = value - 12;
 

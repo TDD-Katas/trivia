@@ -5,10 +5,9 @@ import java.util.LinkedList;
 
 public class Game {
     ArrayList players = new ArrayList();
-    int[] places = new int[6];
-    int[] purses = new int[6];
-    boolean[] inPenaltyBox = new boolean[6];
+
     PlayerState[] playerStates = new PlayerState[6];
+
     private int totalPlayers;
 
     LinkedList popQuestions = new LinkedList();
@@ -17,7 +16,6 @@ public class Game {
     LinkedList rockQuestions = new LinkedList();
 
     int currentPlayerIndex = 0;
-    boolean isGettingOutOfPenaltyBox;
     private final Questions QUESTIONS;
 
     public Game() {
@@ -31,37 +29,35 @@ public class Game {
     }
 
     public boolean game_builder_add(String playerName) {
-
-
+        int currentIndex = totalPlayers;
         players.add(playerName);
-        int nextPlayer = totalPlayers(players);
-        places[nextPlayer] = 0;
-        purses[nextPlayer] = 0;
-        inPenaltyBox[nextPlayer] = false;
-//        playerStates[nextPlayer] = new PlayerState();
-        totalPlayers = totalPlayers(players);
+
+        playerStates[currentIndex]= new PlayerState(false, false, playerName, 0, 0);
+        totalPlayers = currentIndex + 1;
+
+        if (totalPlayers > 5) throw new ArrayIndexOutOfBoundsException(6);
 
         display(playerName + " was added");
-        display("They are player number " + nextPlayer);
+        display("They are player number " + totalPlayers);
         return true;
     }
 
     public boolean game_builder_isPlayable() {
-        return (totalPlayers(players) >= 2);
+        return (players.size() >= 2);
     }
 
 
     private static class PlayerState {
         private final boolean currentPlayerIsGettingOutOfPenaltyBox;
         private final boolean currentPlayerIsCurrentlyInThePenaltyBox;
-        private final Object currentPlayerName;
+        private final String currentPlayerName;
         private final int currentPlayerInitialPlace;
 
         private final int purse;
 
         private PlayerState(boolean currentPlayerIsGettingOutOfPenaltyBox,
                             boolean currentPlayerIsCurrentlyInThePenaltyBox,
-                            Object currentPlayerName,
+                            String currentPlayerName,
                             int currentPlayerInitialPlace, int purse) {
             this.currentPlayerIsGettingOutOfPenaltyBox = currentPlayerIsGettingOutOfPenaltyBox;
             this.currentPlayerIsCurrentlyInThePenaltyBox = currentPlayerIsCurrentlyInThePenaltyBox;
@@ -78,11 +74,11 @@ public class Game {
             return currentPlayerIsCurrentlyInThePenaltyBox;
         }
 
-        public Object getCurrentPlayerName() {
+        public String getCurrentPlayerName() {
             return currentPlayerName;
         }
 
-        public int getCurrentPlayerInitialPlace() {
+        public int getCurrentPlayerPlace() {
             return currentPlayerInitialPlace;
         }
         public int getPurse() {
@@ -95,30 +91,27 @@ public class Game {
         boolean notAWinner;
 
 
-        Object currentPlayerName = currentPlayerName(currentPlayerIndex, players);
-        boolean currentPlayerIsCurrentlyInThePenaltyBox = inPenaltyBox[currentPlayerIndex];
+        PlayerState retrievedPlayerState = playerStates[currentPlayerIndex];
 
         PlayerState currentPlayerState =
-                new PlayerState(isGettingOutOfPenaltyBox,
-                        currentPlayerIsCurrentlyInThePenaltyBox,
-                        currentPlayerName,
-                        places[currentPlayerIndex],
-                        purses[currentPlayerIndex]);
+                new PlayerState(retrievedPlayerState.isCurrentPlayerIsGettingOutOfPenaltyBox(),
+                        retrievedPlayerState.isCurrentPlayerIsCurrentlyInThePenaltyBox(),
+                        retrievedPlayerState.getCurrentPlayerName(),
+                        retrievedPlayerState.getCurrentPlayerPlace(),
+                        retrievedPlayerState.getPurse());
         RollResult rollResult = game_do_roll(rollValue, currentPlayerState, QUESTIONS);
 
         //Writes
-        places[currentPlayerIndex] = rollResult.getNewPlayerPlace();
-        isGettingOutOfPenaltyBox = rollResult.isGettingOutOfPenaltyBox();
         LinkedList categoryUsedForQuestion = rollResult.getCategoryUsedForQuestion();
         if (!categoryUsedForQuestion.isEmpty()) {
             categoryUsedForQuestion.removeFirst();
         }
         PlayerState playerStateAfterRoll =
                 new PlayerState(rollResult.isGettingOutOfPenaltyBox(),
-                        inPenaltyBox[currentPlayerIndex],
-                        currentPlayerName,
+                        currentPlayerState.isCurrentPlayerIsCurrentlyInThePenaltyBox(),
+                        retrievedPlayerState.getCurrentPlayerName(),
                         rollResult.getNewPlayerPlace(),
-                        purses[currentPlayerIndex]);
+                        currentPlayerState.getPurse());
 
         PlayerState playerStateAfterAnswer;
         if (game_isPlayerAllowedToAnswer(playerStateAfterRoll.isCurrentPlayerIsGettingOutOfPenaltyBox(),
@@ -126,21 +119,17 @@ public class Game {
 
             AnswerResult answerResult = game_do_answer(answer, playerStateAfterRoll);
 
-            //Writes
-            purses[currentPlayerIndex] = answerResult.getNewPurseValue();
-            inPenaltyBox[currentPlayerIndex] = answerResult.getPlayerPenaltyBoxStatus();
-
             playerStateAfterAnswer =
                     new PlayerState(playerStateAfterRoll.isCurrentPlayerIsGettingOutOfPenaltyBox(),
                             answerResult.getPlayerPenaltyBoxStatus(),
                             playerStateAfterRoll.getCurrentPlayerName(),
-                            playerStateAfterRoll.getCurrentPlayerInitialPlace(),
+                            playerStateAfterRoll.getCurrentPlayerPlace(),
                             answerResult.getNewPurseValue());
         } else {
             playerStateAfterAnswer = playerStateAfterRoll;
         }
 
-
+        playerStates[currentPlayerIndex] = playerStateAfterAnswer;
 
         notAWinner = !didPlayerWin(playerStateAfterAnswer.getPurse());
 
@@ -188,10 +177,10 @@ public class Game {
             }
         }
 
-        int newPlayerPlace = playerState.getCurrentPlayerInitialPlace();
+        int newPlayerPlace = playerState.getCurrentPlayerPlace();
         LinkedList categoryToUse = new LinkedList();
         if (!playerState.isCurrentPlayerIsCurrentlyInThePenaltyBox() || newValueForIsGettingOutOfPenaltyBox) {
-            newPlayerPlace = place_changePlaceForPlayer(roll, playerState.getCurrentPlayerInitialPlace(), playerState.getCurrentPlayerName());
+            newPlayerPlace = place_changePlaceForPlayer(roll, playerState.getCurrentPlayerPlace(), playerState.getCurrentPlayerName());
 
             String category = getCategoryForPlayerPlace(newPlayerPlace);
             display("The category is " + category);
@@ -303,10 +292,6 @@ public class Game {
 
     private static Object getCurrentPlayerName(ArrayList players, int currentPlayerIndex) {
         return players.get(currentPlayerIndex);
-    }
-
-    private static int totalPlayers(ArrayList players) {
-        return players.size();
     }
 
     //~~~~ PURE penalty box related

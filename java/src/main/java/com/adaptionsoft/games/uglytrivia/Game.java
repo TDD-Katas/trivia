@@ -8,6 +8,8 @@ public class Game {
     int[] places = new int[6];
     int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
+    PlayerState[] playerStates = new PlayerState[6];
+    private int totalPlayers;
 
     LinkedList popQuestions = new LinkedList();
     LinkedList scienceQuestions = new LinkedList();
@@ -28,11 +30,33 @@ public class Game {
         QUESTIONS = new Questions(popQuestions, scienceQuestions, sportsQuestions, rockQuestions);
     }
 
+    public boolean game_builder_add(String playerName) {
+
+
+        players.add(playerName);
+        int nextPlayer = totalPlayers(players);
+        places[nextPlayer] = 0;
+        purses[nextPlayer] = 0;
+        inPenaltyBox[nextPlayer] = false;
+//        playerStates[nextPlayer] = new PlayerState();
+        totalPlayers = totalPlayers(players);
+
+        display(playerName + " was added");
+        display("They are player number " + nextPlayer);
+        return true;
+    }
+
+    public boolean game_builder_isPlayable() {
+        return (totalPlayers(players) >= 2);
+    }
+
+
     private static class PlayerState {
         private final boolean currentPlayerIsGettingOutOfPenaltyBox;
         private final boolean currentPlayerIsCurrentlyInThePenaltyBox;
         private final Object currentPlayerName;
         private final int currentPlayerInitialPlace;
+
         private final int purse;
 
         private PlayerState(boolean currentPlayerIsGettingOutOfPenaltyBox,
@@ -61,10 +85,10 @@ public class Game {
         public int getCurrentPlayerInitialPlace() {
             return currentPlayerInitialPlace;
         }
-
         public int getPurse() {
             return purse;
         }
+
     }
 
     public boolean p_round(int rollValue, int answer) {
@@ -120,24 +144,11 @@ public class Game {
 
         notAWinner = !didPlayerWin(playerStateAfterAnswer.getPurse());
 
-        currentPlayerIndex = game_getNextPlayer(currentPlayerIndex, totalPlayers(players));
+        currentPlayerIndex = game_getNextPlayer(currentPlayerIndex, totalPlayers);
         return notAWinner;
     }
 
-    public boolean game_builder_isPlayable() {
-        return (totalPlayers(players) >= 2);
-    }
 
-    public boolean game_builder_add(String playerName) {
-        players.add(playerName);
-        places[totalPlayers(players)] = 0;
-        purses[totalPlayers(players)] = 0;
-        inPenaltyBox[totalPlayers(players)] = false;
-
-        display(playerName + " was added");
-        display("They are player number " + totalPlayers(players));
-        return true;
-    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

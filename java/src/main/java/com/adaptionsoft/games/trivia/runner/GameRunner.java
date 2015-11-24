@@ -19,24 +19,15 @@ public class GameRunner {
         Game aGame = new Game();
 
         for (String player : players) {
-            aGame.p_add(player);
+            aGame.game_builder_add(player);
         }
 
-        System.out.println("isPlayable = " + aGame.p_isPlayable());
+        System.out.println("isPlayable = " + aGame.game_builder_isPlayable());
 
         Random rand = new Random(seed);
 
         do {
-
-            aGame.p_roll(rand.nextInt(5) + 1);
-            int answer = rand.nextInt(9);
-
-            if (aGame.p_isCurrentPlayerAllowedToAnswer()) {
-                aGame.p_answer(answer);
-            }
-            notAWinner = aGame.p_shouldContinueGame();
-
-            aGame.game_moveToNextPlayer();
+            notAWinner = aGame.p_round(rand.nextInt(5) + 1, rand.nextInt(9));
         } while (notAWinner);
     }
 }

@@ -1,11 +1,13 @@
 package com.adaptionsoft.games.uglytrivia;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class Game {
     PlayerState[] playerStates = new PlayerState[6];
 
+
+    LinkedList<PlayerState> aCircular = new LinkedList<PlayerState>();
     private int totalPlayers;
 
     LinkedList popQuestions = new LinkedList();
@@ -13,7 +15,6 @@ public class Game {
     LinkedList sportsQuestions = new LinkedList();
     LinkedList rockQuestions = new LinkedList();
 
-    int currentPlayerIndex = 0;
     private final Questions QUESTIONS;
 
     public Game() {
@@ -29,7 +30,9 @@ public class Game {
     public boolean game_builder_add(String playerName) {
         int currentIndex = totalPlayers;
 
-        playerStates[currentIndex]= new PlayerState(false, false, playerName, 0, 0);
+        PlayerState newPlayerState = new PlayerState(false, false, playerName, 0, 0);
+        playerStates[currentIndex]= newPlayerState;
+        aCircular.add(newPlayerState);
         totalPlayers = currentIndex + 1;
 
         if (totalPlayers > 5) throw new ArrayIndexOutOfBoundsException(6);
@@ -84,6 +87,23 @@ public class Game {
 
     }
 
+    public void p_theGameLoop(Random rand) {
+        boolean notAWinner;
+        do {
+            PlayerState playerStateBefore = aCircular.pollFirst();
+
+            PlayerState playerStateAfterRoll = p_roll(rand.nextInt(5) + 1, playerStateBefore);
+            PlayerState playerStateAfterAnswer = p_answer(rand.nextInt(9), playerStateAfterRoll);
+
+            //Writes !
+            notAWinner = !didPlayerWin(playerStateAfterAnswer.getPurse());
+
+            //Writes !
+            aCircular.add(playerStateAfterAnswer);
+        } while (notAWinner);
+    }
+
+
     private PlayerState p_roll(int rollValue, PlayerState currentPlayerState) {
         RollResult rollResult = game_do_roll(rollValue, currentPlayerState, QUESTIONS);
 
@@ -120,38 +140,11 @@ public class Game {
         return playerStateAfterAnswer;
     }
 
-    public boolean p_round(int rollValue, int answer) {
-        boolean notAWinner;
-
-
-        PlayerState playerStateBefore = playerStates[currentPlayerIndex];
-
-        PlayerState playerStateAfterRoll = p_roll(rollValue, playerStateBefore);
-        PlayerState playerStateAfterAnswer = p_answer(answer, playerStateAfterRoll);
-
-        //Writes !
-        notAWinner = !didPlayerWin(playerStateAfterAnswer.getPurse());
-
-        //Writes !
-        playerStates[currentPlayerIndex] = playerStateAfterAnswer;
-        currentPlayerIndex = game_getNextPlayer(currentPlayerIndex, totalPlayers);
-        return notAWinner;
-    }
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     //~~~~ PURE game related
-
-    private static int game_getNextPlayer(int currentPlayerIndex, int totalPlayers) {
-        int currentPlayer = currentPlayerIndex;
-        int nextPlayer = currentPlayer + 1;
-        if (nextPlayer == totalPlayers)
-            nextPlayer = 0;
-
-        return nextPlayer;
-    }
 
     private static boolean game_isPlayerAllowedToAnswer(boolean isGettingOutOfPenaltyBox, boolean isPlayerCurrentlyInThePenaltyBox) {
         return !isPlayerCurrentlyInThePenaltyBox || isGettingOutOfPenaltyBox;
@@ -185,13 +178,13 @@ public class Game {
             String category = getCategoryForPlayerPlace(newPlayerPlace);
             display("The category is " + category);
 
-            if (category == "Pop")
+            if (category.equals("Pop"))
                 categoryToUse = questions.getPopQuestions();
-            if (category == "Science")
+            if (category.equals("Science"))
                 categoryToUse = questions.getScienceQuestions();
-            if (category == "Sports")
+            if (category.equals("Sports"))
                 categoryToUse = questions.getSportsQuestions();
-            if (category == "Rock")
+            if (category.equals("Rock"))
                 categoryToUse = questions.getRockQuestions();
 
             System.out.println(categoryToUse.peekFirst());
@@ -282,12 +275,6 @@ public class Game {
 
     private static boolean didPlayerWin(int purse) {
         return purse == 6;
-    }
-
-    //~~~~ PURE players related
-
-    private static Object getCurrentPlayerName(ArrayList players, int currentPlayerIndex) {
-        return players.get(currentPlayerIndex);
     }
 
     //~~~~ PURE penalty box related

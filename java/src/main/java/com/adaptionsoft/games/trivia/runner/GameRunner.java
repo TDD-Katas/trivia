@@ -14,8 +14,6 @@ public class GameRunner {
     }
 
     public static void runWith(int seed, String[] players) {
-        boolean notAWinner;
-
         Game aGame = new Game();
 
         for (String player : players) {
@@ -26,8 +24,6 @@ public class GameRunner {
 
         Random rand = new Random(seed);
 
-        do {
-            notAWinner = aGame.p_round(rand.nextInt(5) + 1, rand.nextInt(9));
-        } while (notAWinner);
+        aGame.p_theGameLoop(rand);
     }
 }

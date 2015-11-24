@@ -70,25 +70,23 @@ public class Game {
         return !didPlayerWin(currentPlayerIndex, purses);
     }
 
-
     public void game_moveToNextPlayer() {
-        game_incrementPlayerIndex();
-        game_resetPlayerIfLast(currentPlayerIndex, players);
-    }
-
-    private void game_incrementPlayerIndex() {
-        currentPlayerIndex++;
-    }
-
-    private void game_resetPlayerIfLast(int currentPlayer, ArrayList players) {
-        if (currentPlayer == totalPlayers(players))
-            this.currentPlayerIndex = 0;
+        currentPlayerIndex = game_getNextPlayer(currentPlayerIndex, totalPlayers(players));
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
     //~~~~ PURE game related
+
+
+    private static int game_getNextPlayer(int currentPlayerIndex, int totalPlayers) {
+        int currentPlayer = currentPlayerIndex;
+        int nextPlayer = currentPlayer + 1;
+        if (nextPlayer == totalPlayers)
+            nextPlayer = 0;
+
+        return nextPlayer;
+    }
 
     private static boolean game_isPlayerAllowedToAnswer(int currentPlayerIndex, boolean[] inPenaltyBox, boolean isGettingOutOfPenaltyBox) {
         return !isPlayerInPenaltyBox(currentPlayerIndex, inPenaltyBox) || isGettingOutOfPenaltyBox;

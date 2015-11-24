@@ -1,16 +1,16 @@
-[111, []] = isPlayable = false
+[111, [Ljava.lang.String;@f2a0b8e] = isPlayable = false
 java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
  
-[121, []] = isPlayable = false
+[121, [Ljava.lang.String;@f2a0b8e] = isPlayable = false
 java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
  
-[321, []] = isPlayable = false
+[321, [Ljava.lang.String;@f2a0b8e] = isPlayable = false
 java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
  
-[4323, []] = isPlayable = false
+[4323, [Ljava.lang.String;@f2a0b8e] = isPlayable = false
 java.lang.IndexOutOfBoundsException: Index: 0, Size: 0
  
-[111, [Chet]] = Chet was added
+[111, [Ljava.lang.String;@593634ad] = Chet was added
 They are player number 1
 isPlayable = false
 Chet is the current player
@@ -56,7 +56,7 @@ Science Question 1
 Answer was correct!!!!
 Chet now has 6 Gold Coins.
  
-[121, [Chet]] = Chet was added
+[121, [Ljava.lang.String;@593634ad] = Chet was added
 They are player number 1
 isPlayable = false
 Chet is the current player
@@ -124,7 +124,7 @@ Sports Question 1
 Answer was correct!!!!
 Chet now has 6 Gold Coins.
  
-[321, [Chet]] = Chet was added
+[321, [Ljava.lang.String;@593634ad] = Chet was added
 They are player number 1
 isPlayable = false
 Chet is the current player
@@ -199,7 +199,7 @@ Pop Question 2
 Answer was correct!!!!
 Chet now has 6 Gold Coins.
  
-[4323, [Chet]] = Chet was added
+[4323, [Ljava.lang.String;@593634ad] = Chet was added
 They are player number 1
 isPlayable = false
 Chet is the current player
@@ -266,7 +266,7 @@ Pop Question 1
 Answer was correct!!!!
 Chet now has 6 Gold Coins.
  
-[111, [Chet, Pat, Sue]] = Chet was added
+[111, [Ljava.lang.String;@20fa23c1] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2
@@ -389,7 +389,7 @@ Rock Question 5
 Answer was correct!!!!
 Pat now has 6 Gold Coins.
  
-[121, [Chet, Pat, Sue]] = Chet was added
+[121, [Ljava.lang.String;@20fa23c1] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2
@@ -515,7 +515,7 @@ Pop Question 2
 Answer was correct!!!!
 Pat now has 6 Gold Coins.
  
-[321, [Chet, Pat, Sue]] = Chet was added
+[321, [Ljava.lang.String;@20fa23c1] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2
@@ -656,7 +656,7 @@ Pop Question 2
 Answer was correct!!!!
 Sue now has 6 Gold Coins.
  
-[4323, [Chet, Pat, Sue]] = Chet was added
+[4323, [Ljava.lang.String;@20fa23c1] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2
@@ -775,7 +775,7 @@ Pop Question 5
 Answer was correct!!!!
 Chet now has 6 Gold Coins.
  
-[111, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+[111, [Ljava.lang.String;@3581c5f3] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2
@@ -787,7 +787,7 @@ Anthony was added
 They are player number 5
 java.lang.ArrayIndexOutOfBoundsException: 6
  
-[121, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+[121, [Ljava.lang.String;@3581c5f3] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2
@@ -799,7 +799,7 @@ Anthony was added
 They are player number 5
 java.lang.ArrayIndexOutOfBoundsException: 6
  
-[321, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+[321, [Ljava.lang.String;@3581c5f3] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2
@@ -811,7 +811,7 @@ Anthony was added
 They are player number 5
 java.lang.ArrayIndexOutOfBoundsException: 6
  
-[4323, [Chet, Pat, Sue, Mark, Anthony, Greg]] = Chet was added
+[4323, [Ljava.lang.String;@3581c5f3] = Chet was added
 They are player number 1
 Pat was added
 They are player number 2

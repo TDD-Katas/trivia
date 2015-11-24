@@ -2,7 +2,6 @@ package com.adaptionsoft.games.trivia;
 
 import approvaltest.BeyondCompareMacReporter;
 import com.adaptionsoft.games.trivia.runner.GameRunner;
-import com.adaptionsoft.games.trivia.runner.Players;
 import org.approvaltests.legacycode.LegacyApprovals;
 import org.approvaltests.reporters.UseReporter;
 import org.junit.Test;
@@ -19,11 +18,11 @@ public class GoldenMasterTest {
         Integer[] seeds = {
                 111, 121, 321, 4323
         };
-        Players[] players = new Players[]{
-                new Players(),
-                new Players("Chet"),
-                new Players("Chet", "Pat", "Sue"),
-                new Players("Chet", "Pat", "Sue", "Mark", "Anthony", "Greg"),
+        String[][] players = new String[][]{
+                new String[0],
+                new String[]{"Chet"},
+                new String[]{"Chet", "Pat", "Sue"},
+                new String[]{"Chet", "Pat", "Sue", "Mark", "Anthony", "Greg"},
         };
         LegacyApprovals.LockDown(this, "runGame", seeds, players);
     }
@@ -31,7 +30,7 @@ public class GoldenMasterTest {
 
     //~~~ Helpers
 
-    public String runGame(Integer seed, Players players) {
+    public String runGame(Integer seed, String[] players) {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
         PrintStream outStream = new PrintStream(outContent);

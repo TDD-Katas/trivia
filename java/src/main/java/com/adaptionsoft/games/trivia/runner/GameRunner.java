@@ -10,10 +10,10 @@ public class GameRunner {
 
 
     public static void main(String[] args) {
-        runWith(111, new Players("Chet", "Pat", "Sue"));
+        runWith(111, new String[]{"Chet", "Pat", "Sue"});
     }
 
-    public static void runWith(int seed, Players players) {
+    public static void runWith(int seed, String[] players) {
         boolean notAWinner;
 
         Game aGame = new Game();
